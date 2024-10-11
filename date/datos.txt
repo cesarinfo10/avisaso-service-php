@@ -1,0 +1,9 @@
+CPANEL:
+www.proyectis.cl/cpanel
+usuario: proyecti
+pass: Maol5261#
+
+BASE DE DATOS:
+bd: proyecti_i.bim-admin
+usuario: proyecti_casv
+pass:t$W]7Vnd2e~}
