@@ -20,13 +20,13 @@ class ControladorServicios{
     /*=============================================
 	LLAMAR A TODAS LAS LICITAIONES POR  SERVICIO
 	=============================================*/
-    static public function alllLicitaionesCTR($dni_usuario_licita){
+    static public function allLicitaionesCTR($dni_usuario_licita){
 
         header('Content-type:application/json');
 
         $tabla = "licitar";
 
-        $respuesta = ModelServicios::alllLicitaionesMDL($tabla, $dni_usuario_licita);
+        $respuesta = ModelServicios::allLicitaionesMDL($tabla, $dni_usuario_licita);
     
         $array=json_encode($respuesta);
         
@@ -34,27 +34,25 @@ class ControladorServicios{
     }
 
 
-
-    
-/*================================================================================================================*/
-/*================================================================================================================*/
-    /*=============================================
-	LLAMAR A TODOS LOS TIPO USUARIO
-	=============================================*/
-    static public function todosServiciosCTR($usser){
+    static public function detalleLicitacionesUserCTR($id_licitacion){
 
         header('Content-type:application/json');
-        
-        $usuario = "usuarios";
-        $tabla = "detalle_reporte";
-        $tablaFoto = "foto_reporte";
 
-        $respuesta = ModelServicios::todosServiciosMDL($usuario, $tabla, $tablaFoto, $usser);
+        $tabla = "licitar";
+
+        $respuesta = ModelServicios::detalleLicitacionesUserMDL($tabla, $id_licitacion);
     
         $array=json_encode($respuesta);
         
         echo $array;
     }
+
+
+    
+/*================================================================================================================*/
+/*================================================================================================================*/
+
+
     /*====================================================
 	LLAMAR A TODOS LOS REPORTES SIN SOLUCION TIPO USUARIOS
 	=====================================================*/

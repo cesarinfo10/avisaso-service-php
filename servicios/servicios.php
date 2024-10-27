@@ -38,9 +38,6 @@ AGEGAR LICITACIÓN DEL USUARIO
         $updateReporte->addServicioCTR($datos);       
     }
 
-
-
-
 //URL http://localhost/avisaso-service/servicios/servicios.php?dni_usuario_licita=1-9&todosServicios
 /*=============================================
 LLAMAR A TODAS LAS LICITAIONES POR  SERVICIO
@@ -48,8 +45,18 @@ LLAMAR A TODAS LAS LICITAIONES POR  SERVICIO
 if (isset($_GET['todosServicios'])){
     $dni_usuario_licita = $_GET['dni_usuario_licita'];
     $allLicitaciones= new ControladorServicios();
-    $allLicitaciones->alllLicitaionesCTR($dni_usuario_licita);
+    $allLicitaciones->allLicitaionesCTR($dni_usuario_licita);
     
+    }
+
+//URL http://localhost/avisaso-service/servicios/servicios.php?id=1-9&detalleLicitacionesUser
+/*=============================================
+LLAMAR A TODAS LAS LICITAIONES POR  SERVICIO
+=============================================*/
+if (isset($_GET['detalleLicitacionesUser'])){
+    $id_licitacion = $_GET['id'];
+    $allLicitaciones= new ControladorServicios();
+    $allLicitaciones->detalleLicitacionesUserCTR($id_licitacion); 
     }
 
 

@@ -35,7 +35,7 @@ INSERTAR LICITAR SERVICIO
     /*=============================================
 	LLAMAR A TODAS LAS LICITAIONES POR  SERVICIO
 	=============================================*/
-    static public function alllLicitaionesMDL($tabla, $dni_usuario_licita){
+    static public function allLicitaionesMDL($tabla, $dni_usuario_licita){
 
         $sql = Conexion::conectar()->prepare("SELECT *FROM $tabla WHERE dni_usuario_licita= :dni ORDER BY id DESC");
 
@@ -47,7 +47,20 @@ INSERTAR LICITAR SERVICIO
  
     }
 
+    /*=============================================
+	LLAMAR A TODAS LAS LICITACIONES CON Y SI RTA.
+	=============================================*/
+    static public function detalleLicitacionesUserMDL($tabla, $id_licitacion){
 
+        $sql = Conexion::conectar()->prepare("SELECT *FROM $tabla WHERE id= :id");
+
+        $sql -> bindParam(":id",$id_licitacion, PDO::PARAM_STR);
+
+        $sql ->execute();
+
+        return $sql->fetch(PDO::FETCH_ASSOC);
+ 
+    }
     
 /*================================================================================================================*/
 /*================================================================================================================*/
