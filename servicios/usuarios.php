@@ -83,7 +83,7 @@ if (isset($_GET['upadateUser'])){
         
     }
 
-//URL http://localhost/avisaso-service/servicios/usuarios.php?user=92767291&consultaUser
+//URL http://localhost/avisaso-service/servicios/usuarios.php?dni=92767291&consultaUser
 /*=============================================
 CONSULTA USUARIO (LLAMAR SESIÓN)
 =============================================*/

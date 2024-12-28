@@ -94,7 +94,8 @@ class ModelSession{
 	=============================================*/
     static public function consultaUserMDL($tabla, $dni){
         // $contrasena= base64_encode($pass);
-         $sql = Conexion::conectar()->prepare("  SELECT 
+        var_dump($tabla);
+         $sql = Conexion::conectar()->prepare("SELECT 
         u.id, 
         u.tipo_usuario, 
         t.tipo_usuario AS tipo, 
@@ -112,7 +113,7 @@ class ModelSession{
         u.carta_presentacion, 
         u.estado 
         FROM $tabla u
-        JOIN tipo_usuario t ON u.tipo_usuario = t.id
+        LEFT JOIN tipo_usuario t ON u.tipo_usuario = t.id
         WHERE u.dni = :dni");
  
          $sql -> bindParam(":dni",$dni, PDO::PARAM_STR);
