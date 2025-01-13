@@ -94,7 +94,6 @@ class ModelSession{
 	=============================================*/
     static public function consultaUserMDL($tabla, $dni){
         // $contrasena= base64_encode($pass);
-        var_dump($tabla);
          $sql = Conexion::conectar()->prepare("SELECT 
         u.id, 
         u.tipo_usuario, 
