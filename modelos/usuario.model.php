@@ -202,6 +202,7 @@ class ModelSession{
     static public function busquedaOneUserSerMDL($tablaUsuarios, $tablaServicios, $nomServicio){
         $sql = Conexion::conectar()->prepare("SELECT 
             nomServicio,
+            (SELECT a.dni FROM $tablaUsuarios a WHERE a.dni = b.dni) AS dni,
             (SELECT a.nombres FROM $tablaUsuarios a WHERE a.dni = b.dni) AS nombres,
             (SELECT a.apellidos FROM $tablaUsuarios a WHERE a.dni = b.dni) AS apellidos,
             (SELECT a.celular FROM $tablaUsuarios a WHERE a.dni = b.dni) AS celular,
