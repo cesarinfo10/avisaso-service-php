@@ -4,7 +4,7 @@ class ControladorServicios{
 
 
     /*=============================================
-	UPDATE REPORTE DESDE LA WEB
+	AGREGAR SERVICIO
 	=============================================*/
     static public function addServicioCTR($datos){
 
@@ -48,7 +48,31 @@ class ControladorServicios{
     }
 
 
+    /*===================================================
+	LLAMAR A TODAS LAS LICITAIONES POR NOMBRE DE SERVICIO
+	===================================================*/
+    static public function allLicitaionesNomCTR($dni){
+
+        header('Content-type:application/json');
+
+        $respuesta = ModelServicios::allLicitaionesNomMDL($dni);
     
+        $array=json_encode($respuesta);
+        
+        echo $array;
+    }
+
+   /*=============================================
+	AGREGAR SERVICIO
+	=============================================*/
+    static public function rechazarServicioCTR($datos){
+
+        $respuesta = ModelServicios::rechazarServicioMDL( $datos);
+    
+        echo $respuesta;
+
+        
+    }
 /*================================================================================================================*/
 /*================================================================================================================*/
 

@@ -62,6 +62,29 @@ if (isset($_GET['detalleLicitacionesUser'])){
 
 
     
+/*=============================================
+LLAMAR A TODAS LAS LICITAIONES POR  SERVICIO
+=============================================*/
+if (isset($_GET['todosServiciosPorNom'])){
+    $dni = $_GET['dni'];
+    $allLicitaciones= new ControladorServicios();
+    $allLicitaciones->allLicitaionesNomCTR($dni);
+    
+    }
+
+/*=============================================
+RECHAZAR SERVICIO
+=============================================*/
+    if (isset($_GET['rechazarServicio'])){
+    
+        header('Content-type: application/json');
+        $postdata = file_get_contents("php://input");
+        $request = json_decode($postdata);
+        $datos = ($request);
+    
+        $rechazarServicio= new ControladorServicios();
+        $rechazarServicio->rechazarServicioCTR($datos);       
+    }
 /*================================================================================================================*/
 /*================================================================================================================*/
 

@@ -61,7 +61,84 @@ INSERTAR LICITAR SERVICIO
         return $sql->fetch(PDO::FETCH_ASSOC);
  
     }
+
+    /*===================================================
+	LLAMAR A TODAS LAS LICITAIONES POR NOMBRE DE SERVICIO
+	===================================================*/
+    static public function allLicitaionesNomMDL($dni){
+
+        $conexion = Conexion::conectar();
+
+    // Primero, obtener los nombres de los servicios asociados al dni
+    $sqlServicios = $conexion->prepare("SELECT nomServicio FROM servicios WHERE dni = :dni");
+    $sqlServicios->bindParam(":dni", $dni, PDO::PARAM_STR);
+    $sqlServicios->execute();
+    $servicios = $sqlServicios->fetchAll(PDO::FETCH_COLUMN);
+
+    if (empty($servicios)) {
+        return []; // No hay servicios asociados al dni
+    }
+
+    // Construir la cláusula WHERE para los nombres de servicios
+    $placeholders = implode(',', array_fill(0, count($servicios), '?'));
+    $sqlLicitar = $conexion->prepare("SELECT
+        licitar.*, 
+        licitar_visto_responde.id AS licitar_visto_responde_id, 
+        licitar_visto_responde.dniVe, 
+        licitar_visto_responde.idLicita, 
+        licitar_visto_responde.visto, 
+        licitar_visto_responde.responde, 
+        licitar_visto_responde.aceptado
+    FROM
+        licitar
+        LEFT JOIN
+        licitar_visto_responde
+        ON 
+        licitar.id = licitar_visto_responde.idLicita 
+    WHERE 
+        licitar.nomServicio IN ($placeholders) 
+        AND (licitar_visto_responde.eliminar IS NULL OR licitar_visto_responde.eliminar != 1)
+    ORDER BY 
+        licitar.id DESC");
+
+    // Vincular los nombres de servicios a la consulta
+    foreach ($servicios as $index => $nomServicio) {
+        $sqlLicitar->bindValue($index + 1, $nomServicio, PDO::PARAM_STR);
+    }
+
+    $sqlLicitar->execute();
+
+    return $sqlLicitar->fetchAll(PDO::FETCH_ASSOC);
+    }
     
+/*=============================================
+INSERTAR LICITAR SERVICIO
+=============================================*/
+static public function rechazarServicioMDL($datos){
+
+        
+    $stmt = Conexion::conectar()->prepare("INSERT INTO licitar_visto_responde (dniVe, idLicita, visto, responde, aceptado, eliminar) 
+                                                  VALUES (:dniVe, :idLicita, :visto, :responde, :aceptado, :eliminar)");
+
+        $stmt->bindParam(":dniVe", $datos->dniVe, PDO::PARAM_STR);
+        $stmt->bindParam(":idLicita", $datos->idLicita, PDO::PARAM_STR);
+        $stmt->bindParam(":visto", $datos->visto, PDO::PARAM_STR);
+        $stmt->bindParam(":responde", $datos->responde, PDO::PARAM_STR);
+        $stmt->bindParam(":aceptado", $datos->aceptado, PDO::PARAM_STR);
+        $stmt->bindParam(":eliminar", $datos->eliminar, PDO::PARAM_STR);
+
+    if($stmt->execute()){
+        $lastInsertId = Conexion::conectar()->lastInsertId();
+        
+        return "1";
+
+    }else{
+
+        return "2";
+    
+    }
+    
+}
 /*================================================================================================================*/
 /*================================================================================================================*/
 
