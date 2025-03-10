@@ -63,15 +63,23 @@ class ControladorServicios{
     }
 
    /*=============================================
-	AGREGAR SERVICIO
+	AGREGAR ESTADO SERVICIO - VISTO 
 	=============================================*/
-    static public function rechazarServicioCTR($datos){
+    static public function estadosServicioCTR($datos){
 
-        $respuesta = ModelServicios::rechazarServicioMDL( $datos);
+        $respuesta = ModelServicios::estadosServicioMDL( $datos);
     
-        echo $respuesta;
+        echo $respuesta;    
+    }
 
-        
+    /*=============================================
+	AGREGAR ESTADO SERVICIO - VISTO 
+	=============================================*/
+    static public function respuestaJOBCTR($datos){
+
+        $respuesta = ModelServicios::respuestaJOBMDL( $datos);
+    
+        echo $respuesta;        
     }
 /*================================================================================================================*/
 /*================================================================================================================*/

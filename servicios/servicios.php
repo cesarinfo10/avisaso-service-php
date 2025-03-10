@@ -73,18 +73,31 @@ if (isset($_GET['todosServiciosPorNom'])){
     }
 
 /*=============================================
-RECHAZAR SERVICIO
+CAMBIAR ESTADO DEL SERVICIO
 =============================================*/
-    if (isset($_GET['rechazarServicio'])){
+    if (isset($_GET['estadosServicio'])){
     
         header('Content-type: application/json');
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $datos = ($request);
     
-        $rechazarServicio= new ControladorServicios();
-        $rechazarServicio->rechazarServicioCTR($datos);       
+        $estadosServicio= new ControladorServicios();
+        $estadosServicio->estadosServicioCTR($datos);       
     }
+/*=============================================
+CAMBIAR ESTADO DEL SERVICIO
+=============================================*/
+if (isset($_GET['respuestaJOB'])){
+    
+    header('Content-type: application/json');
+    $postdata = file_get_contents("php://input");
+    $request = json_decode($postdata);
+    $datos = ($request);
+
+    $respuestaJOB= new ControladorServicios();
+    $respuestaJOB->respuestaJOBCTR($datos);       
+}
 /*================================================================================================================*/
 /*================================================================================================================*/
 

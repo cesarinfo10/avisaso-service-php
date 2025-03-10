@@ -70,7 +70,7 @@ INSERTAR LICITAR SERVICIO
         $conexion = Conexion::conectar();
 
     // Primero, obtener los nombres de los servicios asociados al dni
-    $sqlServicios = $conexion->prepare("SELECT nomServicio FROM servicios WHERE dni = :dni");
+    $sqlServicios = $conexion->prepare("SELECT nomServicio FROM servicios WHERE dni = :dni AND estado = 1");
     $sqlServicios->bindParam(":dni", $dni, PDO::PARAM_STR);
     $sqlServicios->execute();
     $servicios = $sqlServicios->fetchAll(PDO::FETCH_COLUMN);
@@ -114,28 +114,106 @@ INSERTAR LICITAR SERVICIO
 /*=============================================
 INSERTAR LICITAR SERVICIO
 =============================================*/
-static public function rechazarServicioMDL($datos){
+static public function estadosServicioMDL($datos){
+    $conexion = Conexion::conectar();
 
-        
-    $stmt = Conexion::conectar()->prepare("INSERT INTO licitar_visto_responde (dniVe, idLicita, visto, responde, aceptado, eliminar) 
-                                                  VALUES (:dniVe, :idLicita, :visto, :responde, :aceptado, :eliminar)");
+    try {
+        // Iniciar una transacción
+        $conexion->beginTransaction();
 
-        $stmt->bindParam(":dniVe", $datos->dniVe, PDO::PARAM_STR);
-        $stmt->bindParam(":idLicita", $datos->idLicita, PDO::PARAM_STR);
-        $stmt->bindParam(":visto", $datos->visto, PDO::PARAM_STR);
-        $stmt->bindParam(":responde", $datos->responde, PDO::PARAM_STR);
-        $stmt->bindParam(":aceptado", $datos->aceptado, PDO::PARAM_STR);
-        $stmt->bindParam(":eliminar", $datos->eliminar, PDO::PARAM_STR);
+        // Verificar si idLicita ya existe en la tabla licitar_visto_responde
+        $stmtCheck = $conexion->prepare("SELECT COUNT(*) FROM licitar_visto_responde WHERE idLicita = :idLicita AND dniVe = :dniVe");
+        $stmtCheck->bindParam(":idLicita", $datos->idLicita, PDO::PARAM_STR);
+        $stmtCheck->bindParam(":dniVe", $datos->dniVe, PDO::PARAM_STR);
 
-    if($stmt->execute()){
-        $lastInsertId = Conexion::conectar()->lastInsertId();
-        
+        $stmtCheck->execute();
+        $exists = $stmtCheck->fetchColumn();
+
+        if ($exists) {
+            // Si idLicita existe, hacer un UPDATE del campo visto
+            $stmtUpdate = $conexion->prepare("UPDATE licitar_visto_responde 
+                                              SET visto = :visto, eliminar = :eliminar
+                                              WHERE idLicita = :idLicita AND dniVe = :dniVe");
+            $stmtUpdate->bindParam(":visto", $datos->visto, PDO::PARAM_STR);
+            $stmtUpdate->bindParam(":eliminar", $datos->eliminar, PDO::PARAM_STR);
+            $stmtUpdate->bindParam(":idLicita", $datos->idLicita, PDO::PARAM_STR);
+            $stmtUpdate->bindParam(":dniVe", $datos->dniVe, PDO::PARAM_STR);
+
+            if (!$stmtUpdate->execute()) {
+                throw new Exception("Error al actualizar licitar_visto_responde");
+            }
+        } else {
+            // Si idLicita no existe, hacer un INSERT
+            $stmtInsert = $conexion->prepare("INSERT INTO licitar_visto_responde (dniVe, idLicita, visto, responde, aceptado, eliminar) 
+                                              VALUES (:dniVe, :idLicita, :visto, :responde, :aceptado, :eliminar)");
+
+            $stmtInsert->bindParam(":dniVe", $datos->dniVe, PDO::PARAM_STR);
+            $stmtInsert->bindParam(":idLicita", $datos->idLicita, PDO::PARAM_STR);
+            $stmtInsert->bindParam(":visto", $datos->visto, PDO::PARAM_STR);
+            $stmtInsert->bindParam(":responde", $datos->responde, PDO::PARAM_STR);
+            $stmtInsert->bindParam(":aceptado", $datos->aceptado, PDO::PARAM_STR);
+            $stmtInsert->bindParam(":eliminar", $datos->eliminar, PDO::PARAM_STR);
+
+            if (!$stmtInsert->execute()) {
+                throw new Exception("Error al insertar en licitar_visto_responde");
+            }
+        }
+
+        // Confirmar la transacción
+        $conexion->commit();
+
         return "1";
+    } catch (Exception $e) {
+        // Revertir la transacción en caso de error
+        $conexion->rollBack();
+        return "error: " . $e->getMessage();
+    }
+}
+/*=============================================
+INSERTAR LICITAR SERVICIO
+=============================================*/
+static public function respuestaJOBMDL($datos){
 
-    }else{
+    $conexion = Conexion::conectar();
 
-        return "2";
-    
+    try {
+        // Iniciar una transacción
+        $conexion->beginTransaction();
+
+        // Insertar en la tabla resp_licitar
+        $stmt = $conexion->prepare("INSERT INTO resp_licitar (idLicita, dni_usuario_licita, dni_usuario_responde, respuesta, precio_licitado) 
+                                    VALUES (:idLicita, :dni_usuario_licita, :dni_usuario_responde, :respuesta, :precio_licitado)");
+
+        $stmt->bindParam(":idLicita", $datos->idLicita, PDO::PARAM_STR);
+        $stmt->bindParam(":dni_usuario_licita", $datos->dni_usuario_licita, PDO::PARAM_STR);
+        $stmt->bindParam(":dni_usuario_responde", $datos->dni_usuario_responde, PDO::PARAM_STR);
+        $stmt->bindParam(":respuesta", $datos->respuesta, PDO::PARAM_STR);
+        $stmt->bindParam(":precio_licitado", $datos->precio_licitado, PDO::PARAM_STR);
+
+        if(!$stmt->execute()){
+            throw new Exception("Error al insertar en resp_licitar");
+        }
+
+        // Actualizar la tabla licitar_visto_responde
+        $stmtUpdate = $conexion->prepare("UPDATE licitar_visto_responde 
+                                          SET responde = :responde 
+                                          WHERE idLicita = :idLicita");
+
+        $stmtUpdate->bindParam(":idLicita", $datos->idLicita, PDO::PARAM_STR);
+        $stmtUpdate->bindParam(":responde", $datos->responde, PDO::PARAM_STR);
+
+        if(!$stmtUpdate->execute()){
+            throw new Exception("Error al actualizar licitar_visto_responde");
+        }
+
+        // Confirmar la transacción
+        $conexion->commit();
+
+        return "1";
+    } catch (Exception $e) {
+        // Revertir la transacción en caso de error
+        $conexion->rollBack();
+        return "error: " . $e->getMessage();
     }
     
 }
